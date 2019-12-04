@@ -35,7 +35,7 @@ class BertrandNash(gym.Env): # give it the Box environment
     # An instance of something else (Box environment)
   #  self.observation_space = spaces.Box() # What can we observe? Demand function?
         # Actions of the format Buy x%, Sell x%, Hold, etc.
-    self.action_space = spaces.Box(low=0, high=99, shape=(1, 1), dtype=np.int_)
+    self.action_space = spaces.Box(low=0, high=9, shape=(1, 1), dtype=np.int_)
     
     # Prices contains the OHCL values for the last five prices
     self.observation_space = spaces.Box(
@@ -54,23 +54,23 @@ class BertrandNash(gym.Env): # give it the Box environment
       self.current_step += 1
       reward = self.profit 
       done = self.current_step > 100
-      obs = self._next_observation()
+      obs = self._next_observation(action)
       return obs, reward, done, {}
     
   def reset(self):
       # Reset the state of the environment to an initial state
       self.acc_profit = 0
       self.current_step = 0 # ??
-      return self._next_observation()
+      return 0
   
-  def _next_observation(self):
+  def _next_observation(self, action):
       #obs = np.array([self.profit])
-      obs = self.current_step
-      return obs
+      obs = action
+      return obs # TODO: next_observation needs to be an int
 
   def _take_action(self, action):
       # Here is where the agent decides how much to charge
-      self.demand = 100 - action
+      self.demand = 10 - action
       self.profit = self.demand * action
       self.acc_profit += self.profit
         
