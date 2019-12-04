@@ -28,12 +28,13 @@ env = BertrandNash() # read environment into this
 Q = np.zeros((10, 10)) # Q table
 ##### Parameters
 gamma = 0.99 # discount factor
-alpha = 0.1 # learning rate. Should be decreasing over iterations
-epsilon = 0.85 # Should also decrease
-epsilon_decay = 0.98
+alpha = 0.99 # learning rate. Should be decreasing over iterations
+alpha_decay = 0.99
+epsilon = 0.999 # Should also decrease
+epsilon_decay = 0.9999
 #reward = profit(state, action)# defined as profit in period t. Actually a table?
 num_episodes = 100
-num_steps = 10000 # Problem with larher values is S_next
+num_steps = 110 # Beneficial to have a big value here when exploration is needed
 
 
 #### Q learning Algorithm
@@ -41,7 +42,8 @@ num_steps = 10000 # Problem with larher values is S_next
 for i_episode in range(num_episodes):
     # Set initial observation
     S = env.reset()
-    epsilon = 100
+    epsilon = 0.99
+    alpha = 0.99
     # loop for each step of the episode until S is a terminal state (my case, after convergence)
     for t in range(num_steps):
 #        env.render()
@@ -59,7 +61,7 @@ for i_episode in range(num_episodes):
         # Move to next stage:
         S = S_next
         epsilon = epsilon * epsilon_decay
+        alpha = alpha*alpha_decay
 env.close()
         
-      
-Q = np.zeros((2, 4))
+     

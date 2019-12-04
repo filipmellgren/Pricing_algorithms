@@ -65,17 +65,23 @@ class BertrandNash(gym.Env): # give it the Box environment
   
   def _next_observation(self, action):
       #obs = np.array([self.profit])
-      obs = action
-      return obs # TODO: next_observation needs to be an int
+      obs = action # Observe own profit in competitive setting
+      return obs
 
   def _take_action(self, action):
-      # Here is where the agent decides how much to charge
-      self.demand = 10 - action
-      self.profit = self.demand * action
-      self.acc_profit += self.profit
+      # Here is where the agent decides how much to charge ? REALLY?
+      self.quantity = self.demand(action)
+      self.profit = self.quantity * action
+      self.acc_profit += self.profit # Objective function
         
   def render(self, mode='human', close=False):
       # Render the environment to the screen
       print(f'Step: {self.current_step}')
       print(f'Profit: {self.profit}')
       print(f'Acc Profit: {self.acc_profit}')
+      
+  def demand(self, action):
+      quantity = 10 - action
+      return quantity
+      
+      
