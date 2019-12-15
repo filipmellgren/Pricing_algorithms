@@ -96,8 +96,7 @@ class BertrandNash(gym.Env): # give it the Box environment
       ''' 
       
       self.demand(action_n) # sets self.quantity_n
-      self.profit_n = np.asarray(self.quantity_n) * np.asarray(action_n) # TODO: break out into its own method, like quantities
-      #self.profit_n = self.quantity_n * action_n
+      self.profit_n = np.asarray(self.quantity_n) * np.asarray(action_n) #maybe: break out into its own method, like quantities
       reward_n = self.profit_n
       self.state_n = reward_n
       done =  self.current_step > 100 # TODO: don't hardcode
@@ -128,24 +127,27 @@ class BertrandNash(gym.Env): # give it the Box environment
   def demand(self, action_n):
       '''
       demand() calculates demand for each agent's product given actions prices)
-        works for 2 firms. For n firms, denom is a longer sum for j = 1...n
+        WORKS FOR 2 FIRMS. For n firms, denom is a longer sum for j = 1...n
       INPUT:
-          action_n.......list of actions (prices) taken by the agents
+          action_n.......array of actions (prices) taken by the agents
           quality........list with index of product qualities
           mu.............index of horizontal differentiation
       OUTPUT: 
           quantities.....list of quantities, one for each agent. 
       '''
-      #quantities = list(10 - np.asarray(action_n)) # TODO: add complexity once system is working
-      a0 = 1
+# TODO: add complexity once system is working
+      # Parameters used, might want to keep them at the top of the class, outside the function or pass as arguments
+      a0 = 1 
       ai = 2
       aj = 2
       mu = 1
-      pi = action_n
-      #pi = np.arange(0,1,0.01)
-      #pj = action_n[1]
-      pj = 0.5
-      num = np.exp((ai - pi)/mu)
-      denom = np.exp((ai - pi)/(mu)) + np.exp((aj - pj)/(mu)) + np.exp(a0/mu)
+      a = np.array([ai, aj])
+      a_not = np.flip(a) # to obtain the other firm's a
+      p = action_n
+      p_not = np.flip(p) # to obtain the other firm's p
+
+      action_n
+      num = np.exp((a - p)/mu)
+      denom = np.exp((a - p)/(mu)) + np.exp((a_not - p_not)/(mu)) + np.exp(a0/mu)
       self.quantity_n = num / denom
       return
