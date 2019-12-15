@@ -7,6 +7,8 @@ Created on Sun Dec  1 19:54:30 2019
 
 
 !git add "Q_main.py"
+!git add "agents.py"
+!git add "bertrand_nash.py"
 !git add "bertrand_nash.py"
 !git commit -m "My_commit"
 !git push origin master
@@ -21,6 +23,7 @@ import gym
 import collections
 from tensorboardX import SummaryWriter
 from agents import Agent
+from config import PARAMS
 #### Load environment and Q table structure
 # Two Q-tables are necessary, one for each competitor
 # This makes the environment "non stationary" – i.e. hard to solve and not guaranteed to converge
@@ -31,16 +34,12 @@ from agents import Agent
     
 # TODO: initialize the Q table in a smarter way. P. 8 Calvano
 # Parameters
-env = BertrandNash()
-GAMMA = 0.9 # discounting factor
-ALPHA = 0.1 # step size, how much of new value gets added to old value
-EPSILON = 0.3 # probability of exploration. More complicated schedule needed
 
-PARAMS = np.array([env, GAMMA, ALPHA, EPSILON])
+env = PARAMS[0]
+GAMMA = PARAMS[1]
+ALPHA = PARAMS[2]
+EPSILON = PARAMS[3]
 
-
-TEST_EPISODES = 20
-NUM_EPISODES = 10
 
 # Objects
 agent1 = Agent()
@@ -50,10 +49,14 @@ agent2 = Agent()
 writer = SummaryWriter(comment="-q-iteration")
 iter_no = 0
 
-# TODOs
-# * Run  function with more natural parameterizations, like when to stop.
+## TODOs ##
+# Run  function with more natural parameterizations, like when to stop.
 # Number of episodes, when to break an episode
 # Define convergence and a target goal
+# How is the observation spce updated?
+    # maybe in value_update. 
+    # May want to start out simple and define discrete outcomes in the demand function
+    # And then make the observation space a box when I add on DL
 
 #### Q learning Algorithm
 # loop over training episodes p.105 Sutton

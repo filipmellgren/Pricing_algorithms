@@ -11,7 +11,8 @@ import collections
 import numpy as np
 from tensorboardX import SummaryWriter
 from bertrand_nash import BertrandNash
-from __main__ import PARAMS
+#from __main__ import PARAMS
+from config import PARAMS
 
 env = PARAMS[0]
 GAMMA = PARAMS[1]
@@ -29,6 +30,7 @@ class Agent:
         # Make this depend on some epsilon greedy policy or Boltzman annealing
         if np.random.uniform() > EPSILON:
             _, action = self.max_value_action()
+           # action /= 10 # Wonder if this is how to get the actions in range?
         else:
             action = self.env.action_space.sample()
         
@@ -46,10 +48,12 @@ class Agent:
         return max_value, best_action
     
     def value_update(self, s, a, r, next_s):
+        # Update states here?
         best_v, _ = self.max_value_action()
         new_val = r + GAMMA * best_v
         old_val = self.values[(s, a)]
         self.values[(s, a)] = old_val * (1-ALPHA) + new_val * ALPHA
+        self.state = next_s
 
     def play_episode(self, env):
         '''
