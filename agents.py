@@ -11,11 +11,12 @@ import collections
 import numpy as np
 from tensorboardX import SummaryWriter
 from bertrand_nash import BertrandNash
-env = BertrandNash()
+from __main__ import PARAMS
 
-GAMMA = 0.9
-ALPHA = 0.2
-TEST_EPISODES = 20
+env = PARAMS[0]
+GAMMA = PARAMS[1]
+ALPHA = PARAMS[2]
+EPSILON = PARAMS[3]
 
 class Agent:
     def __init__(self):
@@ -26,7 +27,11 @@ class Agent:
     
     def act(self):
         # Make this depend on some epsilon greedy policy or Boltzman annealing
-        _, action = self.max_value_action()
+        if np.random.uniform() > EPSILON:
+            _, action = self.max_value_action()
+        else:
+            action = self.env.action_space.sample()
+        
         return action
     
     def max_value_action(self):
