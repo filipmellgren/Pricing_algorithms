@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Dec  2 12:07:10 2019
+Created on Sun Dec 15 15:53:20 2019
 
 @author: filip
 """
@@ -10,40 +10,13 @@ import gym
 from gym import spaces
 import numpy as np
 
-class BertrandNash(gym.Env): 
+class PrisonerDilemma(gym.Env): 
     # useful blog post:
     # https://stackoverflow.com/questions/52727233/how-can-i-register-a-custom-environment-in-openais-gym
   """
-    Description:
-        A bertrand nash market with stochastic demand.
-    Source:
-        TODO, update from Matilda's slides
-    Observation: 
-        Type: Box(4)
-        Num	Observation                 Min         Max
-        0	Cart Position             -4.8            4.8
-        1	Cart Velocity             -Inf            Inf
-        2	Pole Angle                 -24 deg        24 deg
-        3	Pole Velocity At Tip      -Inf            Inf
-        
-    Actions: UPDATE
-        Type: Discrete(2)
-        Num	Action
-        0	Push cart to the left
-        1	Push cart to the right
-        
-        Note: ...
-    Reward:
-        Reward is the profit observed in every step
-    Starting State: UPDATE
-        All observations are assigned a uniform random value in [-0.05..0.05]
-    Episode Termination: UPDATE
-        Pole Angle is more than 12 degrees
-        Cart Position is more than 2.4 (center of the cart reaches the edge of the display)
-        Episode length is greater than 200
-        Solved Requirements
-        Considered solved when the average reward is greater than or equal to 195.0 over 100 consecutive trials.
-    """
+  similar to BertrandNash but simplified to represent a prisoner dilemma 
+  scenario
+  """
   
   
   metadata = {'render.modes': ['human']} #?
@@ -134,6 +107,7 @@ class BertrandNash(gym.Env):
       '''
 # TODO: add complexity once system is working
       # Parameters used, might want to keep them at the top of the class, outside the function or pass as arguments
+      '''
       a0 = 1 
       ai = 2
       aj = 2
@@ -147,4 +121,16 @@ class BertrandNash(gym.Env):
       num = np.exp((a - p)/mu)
       denom = np.exp((a - p)/(mu)) + np.exp((a_not - p_not)/(mu)) + np.exp(a0/mu)
       self.quantity_n = num / denom
+      '''
+      p = action_n
+      if all(p == np.array([0,0])):
+          self.quantity_n =  np.array([0,0])
+      elif all(p == np.array([1,0])):
+          self.quantity_n =  np.array([-1,2])
+      elif all(p == np.array([0,1])):
+          self.quantity_n =  np.array([2,-1])
+      elif all(p == np.array([1,1])):
+          self.quantity = np.array([1,1])
+      else:
+          print(p)
       return

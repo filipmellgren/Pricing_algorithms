@@ -12,11 +12,8 @@ import numpy as np
 from bertrand_nash import BertrandNash
 env = BertrandNash()
 GAMMA = 0.9 # discounting factor
-ALPHA = 0.1 # step size, how much of new value gets added to old value
+ALPHA = 0.01 # step size, how much of new value gets added to old value
 EPSILON = 0.3 # probability of exploration. More complicated schedule needed
+NUM_EPISODES = 1000
 
-PARAMS = np.array([env, GAMMA, ALPHA, EPSILON])
-
-
-TEST_EPISODES = 20
-NUM_EPISODES = 10
+PARAMS = np.array([env, GAMMA, ALPHA, EPSILON, NUM_EPISODES])
