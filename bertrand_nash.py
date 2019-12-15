@@ -10,18 +10,45 @@ import gym
 from gym import spaces
 import numpy as np
 import random
+import matplotlib
+import matplotlib.pyplot as plt
 
-class BertrandNash(gym.Env): # give it the Box environment
-  """Custom Environment that follows gym interface
-      This class describes a market characterised by Bertrand behaviour
-      Can self.attributes be thought of as endogenous and action as exogenous?
-      
-      Demand is stochastic:
-          prob alpha, zero demand
-          prob (1-alpha), high demand state
-
-      https://stackoverflow.com/questions/52727233/how-can-i-register-a-custom-environment-in-openais-gym
+class BertrandNash(gym.Env): # give it the Box environment  
+    # useful blog post:
+    # https://stackoverflow.com/questions/52727233/how-can-i-register-a-custom-environment-in-openais-gym
   """
+    Description:
+        A bertrand nash market with stochastic demand.
+    Source:
+        TODO, update from Matilda's slides
+    Observation: 
+        Type: Box(4)
+        Num	Observation                 Min         Max
+        0	Cart Position             -4.8            4.8
+        1	Cart Velocity             -Inf            Inf
+        2	Pole Angle                 -24 deg        24 deg
+        3	Pole Velocity At Tip      -Inf            Inf
+        
+    Actions: UPDATE
+        Type: Discrete(2)
+        Num	Action
+        0	Push cart to the left
+        1	Push cart to the right
+        
+        Note: ...
+    Reward:
+        Reward is the profit observed in every step
+    Starting State: UPDATE
+        All observations are assigned a uniform random value in [-0.05..0.05]
+    Episode Termination: UPDATE
+        Pole Angle is more than 12 degrees
+        Cart Position is more than 2.4 (center of the cart reaches the edge of the display)
+        Episode length is greater than 200
+        Solved Requirements
+        Considered solved when the average reward is greater than or equal to 195.0 over 100 consecutive trials.
+    """
+  
+  
   metadata = {'render.modes': ['human']} #?
 # Set this in SOME subclasses
 #  reward_range = (-float('inf'), float('inf'))
@@ -32,24 +59,10 @@ class BertrandNash(gym.Env): # give it the Box environment
 
   def __init__(self):
     # Define action and observation space
-    # They must be gym.spaces objects
-    
-    # inherit class methods from another gym environment
-    # Initialize object with values here
-    # Actions are setting a price inside the interval
-    #self.action_space = spaces.Box(
-    #        low=np.array([0, 0]), high=np.array([1, 1]), dtype=np.float16) # can be of form: np.array([0, 0]). TODO: High should be infinity!
-    # An instance of something else (Box environment)
-
-    # Action space can be bounded between Bertrand Nash equilibrium and monopoly price
-    self.action_space = spaces.Box(low=0, high=9, shape=(2, 1), dtype=np.int_)
-    self.observation_space = spaces.Box(
-            low=0, high=24, shape=(2, 1), dtype=np.int)
-    
-   #? self.state_size = 1
-   #? self.profit = 0
-
-    
+    # TODO: decide what action space to use and what type of competition to model.
+    self.action_space = spaces.Discrete(10) # Page 400 DRL hands on. POSSIBILITY IT IS DISCRETE, two types of prices
+    self.observation_space = spaces.Discrete(10) # Maybe, own action in the last period should be observed as well?
+        # Add to obs space, own action last period, periods of punishment
     super().__init__()
 #    super().all(*args, **kwargs)
     
@@ -72,6 +85,8 @@ class BertrandNash(gym.Env): # give it the Box environment
   '''
 
   def step(self, action_n):
+      # agent gives action
+      # info about outcome is returned (next obs, reward, end flag)
       # action_n..... list of actions taken by the agents
       
       # set action for each agent
@@ -79,49 +94,36 @@ class BertrandNash(gym.Env): # give it the Box environment
       for i, agent in enumerate(self.agents):
           self._take_action(action_n[i], agent)
       ''' 
-      self._take_action(action_n)
-      obs_n    = self._next_observation()
+      
+      self.demand(action_n) # sets self.quantity_n
+      self.profit_n = np.asarray(self.quantity_n) * np.asarray(action_n) # TODO: break out into its own method, like quantities
+      #self.profit_n = self.quantity_n * action_n
       reward_n = self.profit_n
+      self.state_n = reward_n
       done =  self.current_step > 100 # TODO: don't hardcode
       #info_n   = {'n': []} # TODO: what is this?
       self.current_step += 1
-      return obs_n, reward_n, done, {}
+      return self.state_n, reward_n, done, {}
+  # numpy matrix, float value of reward, boolean, extra info
           
   def reset(self):
       # Reset the state of the environment to an initial state
-      self.acc_profit_n = list((0,0)) # TODO: don't hardcode
       self.current_step = 0
-      return self.acc_profit_n
-  
-  def _next_observation(self):
-      '''
-      Makes it explicit that what's observed is the profit
-      INPUT:
-          self.profits
-      '''
-      obs = self.profit_n
-      return obs
-
-  def _take_action(self, action_n):
-      '''
-      _take_action() gives values of the market given the action
-      The calculation of profits assumes mc = 0 <==> Pi = pq
-      INPUT:
-          action_n..........list of actions (prices) set by the agents.
-      OUTPUT:
-          self.quantity_n...list of the quantities sold in the market.
-          self.profit_n......list of profits earned in the market.
-          self.acc_profit_n..list of the agents total accumulated profits (max. objective)
-      '''
-      self.quantity_n = self.demand(action_n)
-      self.profit_n = np.asarray(self.quantity_n) * np.asarray(action_n) # TODO: break out into its own method, like quantities
-      self.acc_profit_n += self.profit_n # Objective function
+      self.profit_n = np.asarray([0,0]) # TODO: Set up smarter
+      self.state_n = self.profit_n 
+      
         
   def render(self, mode='human', close=False):
       # Render the environment to the screen
       print(f'Step: {self.current_step}')
       print(f'Profit: {self.profit}')
-      print(f'Acc Profit: {self.acc_profit}')
+      
+
+  def interact(self, action_n):
+      old_state_n = self.state_n
+      new_state_n, reward_n, is_done, _ = self.step(action_n)
+      self.state_n = self.reset() if is_done else new_state_n
+      return(old_state_n, action_n, reward_n, new_state_n)
       
   def demand(self, action_n):
       '''
@@ -134,12 +136,16 @@ class BertrandNash(gym.Env): # give it the Box environment
       OUTPUT: 
           quantities.....list of quantities, one for each agent. 
       '''
-      quantities = list(10 - np.asarray(action_n)) # TODO: add complexity once system is working
-      #pi = action_n[0]
+      #quantities = list(10 - np.asarray(action_n)) # TODO: add complexity once system is working
+      a0 = 1
+      ai = 2
+      aj = 2
+      mu = 1
+      pi = action_n
+      #pi = np.arange(0,1,0.01)
       #pj = action_n[1]
-      #num = np.exp((ai - pi)/mu)
-      #denom = np.exp((ai - pi)/(mu)) + np.exp((aj - pj)/(mu)) + np.exp(a0/mu)
-      #quantities = num / denom
-      return quantities
-      
-      
+      pj = 0.5
+      num = np.exp((ai - pi)/mu)
+      denom = np.exp((ai - pi)/(mu)) + np.exp((aj - pj)/(mu)) + np.exp(a0/mu)
+      self.quantity_n = num / denom
+      return
