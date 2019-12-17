@@ -19,10 +19,11 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
     # useful blog post:
     # https://stackoverflow.com/questions/52727233/how-can-i-register-a-custom-environment-in-openais-gym
   """
-  Similar to BertrandNash but simplified to represent a discrete scenario.
+  This environment represents a discrete world with two agents. The agents 
+  may set prices which generates profits depending on the joint behaviour.
   
-  Similar to FrozenLake. Instead of a row and column coordinate,
-  we have one price for player 1, and another for player 2.
+  In principle, the environment is similar to FrozenLake with the difference 
+  that rows and columns (the state) are prices in the previous period.
   
   Inherits from discrete.Discrete which:
       

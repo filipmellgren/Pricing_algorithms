@@ -17,7 +17,6 @@ from config import PARAMS
 env = PARAMS[0]
 GAMMA = PARAMS[1]
 ALPHA = PARAMS[2]
-EPSILON = PARAMS[3]
 
 class Agent:
     def __init__(self):
@@ -26,11 +25,10 @@ class Agent:
         self.state = self.env.reset()
         self.values = collections.defaultdict(float)
     
-    def act(self):
+    def act(self, eps):
         # Make this depend on some epsilon greedy policy or Boltzman annealing
-        if np.random.uniform() > EPSILON:
+        if np.random.uniform() > eps:
             _, action = self.max_value_action()
-           # action /= 10 # Wonder if this is how to get the actions in range?
         else:
             action = self.env.action_space.sample()
         
