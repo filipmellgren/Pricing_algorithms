@@ -4,55 +4,56 @@
 Created on Sun Dec 15 15:53:20 2019
 
 @author: filip
+
+# TODO: build on top of dicrete.Discrete
 """
+
+# Discrete case
 
 import gym
 from gym import spaces
 import numpy as np
+from gym.envs.toy_text import discrete
 
-class PrisonerDilemma(gym.Env): 
+class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
     # useful blog post:
     # https://stackoverflow.com/questions/52727233/how-can-i-register-a-custom-environment-in-openais-gym
   """
-  similar to BertrandNash but simplified to represent a prisoner dilemma 
-  scenario
+  Similar to BertrandNash but simplified to represent a discrete scenario
+  
+  Inherits from discrete.Discrete which:
+      
+    Has the following members
+    - nS: number of states
+    - nA: number of actions
+    - P: transitions (*)
+    - isd: initial state distribution (**)
+    
+    (*) dictionary dict of dicts of lists, where
+      P[s][a] == [(probability, nextstate, reward, done), ...]
+    (**) list or array of length nS
+  
   """
   
   
   metadata = {'render.modes': ['human']} #?
-# Set this in SOME subclasses
-#  reward_range = (-float('inf'), float('inf'))
- # spec = None
-  # Set these in ALL subclasses
- # action_space = None # TODO set when possible to test
-  #observation_space = None # TODO set when possible to test
 
   def __init__(self):
-    # Define action and observation space
-    # TODO: decide what action space to use and what type of competition to model.
-    self.action_space = spaces.Discrete(2) # Page 400 DRL hands on. POSSIBILITY IT IS DISCRETE, two types of prices
-    self.observation_space = spaces.Discrete(4) # Maybe, own action in the last period should be observed as well?
-        # Add to obs space, own action last period, periods of punishment
-    super().__init__()
-#    super().all(*args, **kwargs)
+      # self.nrow, self.ncol = nrow, ncol = desc.shape
+      nrow = 20
+      ncol = 1
+      nA = 4
+      nS = nrow * ncol
+      isd = np.zeros(nS)
+      P = {s : {a : [] for a in range(nA)} for s in range(nS)}
+      super(PrisonerDilemma, self).__init__(nS, nA, P, isd)
+        #    super().all(*args, **kwargs)
     
     # Markov game: 
     #https://stackoverflow.com/questions/44369938/openai-gym-environment-for-multi-agent-games
-  '''
-    def step(self, action, player):
-      # Execute one time step within the environment
-      self._take_action(action, player)
-      self.current_step += 1
-      reward = self.profit  # has to be specific to a player
-      done = self.current_step > 100
-      obs = self._next_observation(action)
-      return obs, reward, done, {}
-      
-      
-      action_space: The Space object corresponding to valid actions
-      observation_space: The Space object corresponding to valid observations
-      reward_range: A tuple corresponding to the min and max possible rewards
-  '''
+x = np.random.randint(0,2, 10)
+y = np.random.randint(0,2, 10)
+np.array(x == y).astype('float64').ravel()
 
   def step(self, action_n):
       # agent gives action
@@ -106,6 +107,7 @@ class PrisonerDilemma(gym.Env):
           quantities.....list of quantities, one for each agent. 
       '''
 # TODO: add complexity once system is working
+      # OR, make it flexible within the Discrete environment
       # Parameters used, might want to keep them at the top of the class, outside the function or pass as arguments
       '''
       a0 = 1 
@@ -126,11 +128,11 @@ class PrisonerDilemma(gym.Env):
       if all(p == np.array([0,0])):
           self.quantity_n =  np.array([0,0])
       elif all(p == np.array([1,0])):
-          self.quantity_n =  np.array([-1,2])
+          self.quantity_n =  np.array([0,2])
       elif all(p == np.array([0,1])):
-          self.quantity_n =  np.array([2,-1])
+          self.quantity_n =  np.array([2,0])
       elif all(p == np.array([1,1])):
-          self.quantity = np.array([1,1])
+          self.quantity = np.array([50,50])
       else:
           print(p)
       return
