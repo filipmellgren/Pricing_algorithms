@@ -85,6 +85,7 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
           profit = quantity_n * (p-C)
           return(profit)
           
+          # Necessary to loop over everything in here?
       for row in range(nrow):
             for col in range(ncol):
                 s = to_s(row, col)
@@ -95,9 +96,8 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
                         li = P[s][a]
                         newrow, newcol = action1, action2
                         newstate = to_s(newrow, newcol)
-                        done = False
+                        done = False # TODO: how to handle?
                         reward_n = profit_n(action_n)
-                        done = False # Not sure hot to handle
                         li.append((1.0, newstate, reward_n, done)) # 1.0 is probability
       
       super(PrisonerDilemma, self).__init__(nS, nA, P, isd)

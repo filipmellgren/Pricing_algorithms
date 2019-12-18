@@ -50,6 +50,8 @@ iter_no = 0
 # Replicate Calvano:
     # Update when to break an episode (define convergence)
     # Initialize the Q table in a smarter way. P. 8 Calvano 
+    # Add the average profit gain metric
+    # Scrutinize the loop in prisoner_dilemma
 
 # Continuous case
     # Make the observation space a box so that I can add on DL
@@ -62,15 +64,15 @@ iter_no = 0
 
 #### Q learning Algorithm
 # loop over training episodes p.105 Sutton
-rew = np.zeros((100002,NUM_EPISODES))
-for ep in range(NUM_EPISODES):
+rew = np.zeros((100002,NUM_EPISODES/50))
+for ep in range(NUM_EPISODES/50): # Start out with fewer episodes
     # 1: initialise Qs
     env.reset()
     iter_no = 0
     s_next = 0
     while True: # number of steps per episode
         iter_no += 1
-        eps = 1 - np.exp(-BETA * (iter_no))
+        eps = 1 - np.exp(-BETA * (iter_no)) # Correct 
         # 2: agents choose actions simultanously. 
         action1 = agent1.act(eps)
         action2 = agent2.act(eps)
@@ -86,9 +88,14 @@ for ep in range(NUM_EPISODES):
         #agent2.value_update(s[1].item(), a[1].item(), r[1].item(), s_next[1].item())
         # 5: repeat until convergence
         rew[iter_no][ep] = reward_n[0]
-        if iter_no > 100: # Calvano takes it up to a billion or until convergence!
+        # Check if optimal action has stayed constant for 25k repetitions
+        if iter_no > 10**4: # Calvano takes it up to a billion or until convergence! 
             break
 
 
 env.close()
+
+
+x = np.array([[1, 2], [3, 4], [1,2]])
+profit_n(x)
 

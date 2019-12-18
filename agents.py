@@ -14,17 +14,30 @@ from bertrand_nash import BertrandNash
 from prisoner_dilemma import PrisonerDilemma
 #from __main__ import PARAMS
 from config import PARAMS
+from config import profit_n
 
 env = PrisonerDilemma()
 GAMMA = PARAMS[0]
 ALPHA = PARAMS[1]
+nA = PARAMS[5]
+nS = PARAMS[6]
+
 
 class Agent:
     def __init__(self):
         #self.env = gym.make(ENV_NAME)
         self.env = env
         self.state = self.env.reset()
-        self.values = collections.defaultdict(float)
+        self.values = collections.defaultdict(float) # The Q-table?!
+        
+        # Initialize the Q-table
+        for s in range(nS):
+            for a in range(nA):
+                action = a + np.zeros((nA))
+                action_other = np.arange(0.,nA)
+                actions = np.vstack([action, action_other])
+                profit = profit_n(actions.transpose())
+                self.values = (sum(profit[:,0])) / ((1-GAMMA) * nA)
     
     def act(self, eps):
         # Make this depend on some epsilon greedy policy or Boltzman annealing
