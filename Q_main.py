@@ -26,16 +26,18 @@ import matplotlib.pyplot as plt
 import gym
 import collections
 from tensorboardX import SummaryWriter
-from agents import Agent  
-
+from agents import Agent
+from prisoner_dilemma import PrisonerDilemma
 # Parameters
-from config import PARAMS
-env = PARAMS[0]
-GAMMA = PARAMS[1]
-ALPHA = PARAMS[2]
-BETA = PARAMS[3]
-NUM_EPISODES = PARAMS[4]
+env = PrisonerDilemma()
 
+from config import PARAMS
+GAMMA = PARAMS[0]
+ALPHA = PARAMS[1]
+BETA = PARAMS[2]
+NUM_EPISODES = PARAMS[3]
+NUM_EPISODES = NUM_EPISODES.astype(int) # so annoying this now has to be done
+nA = PARAMS[5]
 # Objects
 agent1 = Agent()
 agent2 = Agent()
@@ -46,7 +48,6 @@ iter_no = 0
 
 ## TODOs ##
 # Replicate Calvano:
-    # update explore exploit schedule
     # Update when to break an episode (define convergence)
     # Initialize the Q table in a smarter way. P. 8 Calvano 
 
@@ -73,7 +74,7 @@ for ep in range(NUM_EPISODES):
         # 2: agents choose actions simultanously. 
         action1 = agent1.act(eps)
         action2 = agent2.act(eps)
-        action = action1*10 + action2 # 10 hardcoded temporary. it's ncol, number of discrete actions
+        action = action1*nA + action2 # converts two actions into an interpretable action
         # 3: outcomes are calculated
         s = s_next # remember old state
         s_next, reward_n, done, prob = env.step(action)        
@@ -85,7 +86,7 @@ for ep in range(NUM_EPISODES):
         #agent2.value_update(s[1].item(), a[1].item(), r[1].item(), s_next[1].item())
         # 5: repeat until convergence
         rew[iter_no][ep] = reward_n[0]
-        if iter_no > 100000: # Calvano takes it up to a billion or until convergence!
+        if iter_no > 100: # Calvano takes it up to a billion or until convergence!
             break
 
 

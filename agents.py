@@ -11,12 +11,13 @@ import collections
 import numpy as np
 from tensorboardX import SummaryWriter
 from bertrand_nash import BertrandNash
+from prisoner_dilemma import PrisonerDilemma
 #from __main__ import PARAMS
 from config import PARAMS
 
-env = PARAMS[0]
-GAMMA = PARAMS[1]
-ALPHA = PARAMS[2]
+env = PrisonerDilemma()
+GAMMA = PARAMS[0]
+ALPHA = PARAMS[1]
 
 class Agent:
     def __init__(self):

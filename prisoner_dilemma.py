@@ -9,11 +9,25 @@ Created on Sun Dec 15 15:53:20 2019
 """
 
 # Discrete case
-
 import gym
 from gym import spaces
 import numpy as np
 from gym.envs.toy_text import discrete
+from config import ECON_PARAMS
+from config import PARAMS
+
+C = ECON_PARAMS[0]
+AI = ECON_PARAMS[1]
+AJ = ECON_PARAMS[1]
+A0 = ECON_PARAMS[2]
+MU = ECON_PARAMS[3]
+MIN_PRICE = ECON_PARAMS[4]
+PRICE_RANGE = ECON_PARAMS[5]
+
+
+
+nA = PARAMS[5] # Number of unique prices
+nA = nA.astype(int)
 
 class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
     # useful blog post:
@@ -44,7 +58,6 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
 
   def __init__(self):
       # self.nrow, self.ncol = nrow, ncol = desc.shape
-      nA = 10 # Number of unique prices
       nrow = nA
       ncol = nA
       nS = nrow * ncol
@@ -59,21 +72,17 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
           return(row*ncol + col)
           
       def profit_n(action_n):
-          a0 = 1 
-          ai = 2
-          aj = 2
-          a = np.array([ai, aj])
+          a = np.array([AI, AJ])
           a_not = np.flip(a) # to obtain the other firm's a
-          mu = 1
           
-          p = action_n/10 # transforms action into price range
+          p = (PRICE_RANGE * action_n/nA) + MIN_PRICE # TODO: set up better. transforms action into price range
           
           p_not = np.flip(p) # to obtain the other firm's p
-          num = np.exp((a - p)/mu)
-          denom = np.exp((a - p)/(mu)) + np.exp((a_not - p_not)/(mu)) + np.exp(a0/mu)
+          num = np.exp((a - p)/MU)
+          denom = np.exp((a - p)/(MU)) + np.exp((a_not - p_not)/(MU)) + np.exp(A0/MU)
           quantity_n = num / denom
           
-          profit = quantity_n * p # mc = 0
+          profit = quantity_n * (p-C)
           return(profit)
           
       for row in range(nrow):
