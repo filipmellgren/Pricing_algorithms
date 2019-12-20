@@ -31,6 +31,8 @@ class Agent:
         self.env = env
         self.state = self.env.reset()
         self.values = collections.defaultdict(float) # The Q-table?!
+        self.best_action = 0
+        self.length_opt_act = 0
         
         # Initialize the Q-table.
         for s in range(nS):
@@ -44,6 +46,7 @@ class Agent:
     def act(self, eps):
         if np.random.uniform() < eps: # eps goes from 0 to 1 over iterations
             _, action = self.max_value_action()
+            self.time_same_best_action(action)
         else:
             action = self.env.action_space.sample()
         
@@ -58,7 +61,13 @@ class Agent:
             if max_value is None or max_value < action_value:
                 max_value = action_value
                 best_action = action
+                self.best_action = action
         return max_value, best_action
+    
+    def time_same_best_action(self, action):
+        if action == self.best_action:
+            self.length_opt_act += 1
+        return
     
     def value_update(self, s, a, r, next_s):
         # Update states here?

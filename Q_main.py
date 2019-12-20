@@ -38,6 +38,7 @@ BETA = PARAMS[2]
 NUM_EPISODES = PARAMS[3].astype(int)
 nA = PARAMS[5].astype(int)
 ITER_BREAK = PARAMS[7].astype(int)
+CONV = PARAMS[8].astype(int)
 # Objects
 agent1 = Agent()
 agent2 = Agent()
@@ -69,6 +70,7 @@ for ep in range(NUM_EPISODES): # Start out with fewer episodes
     print(ep)
     # 1: initialise Qs
     env.reset() # calls discrete.Discrete.reset() is this what I want?
+    # TODO: reset agent
     iter_no = 0
     s_next = 0
     while True: # number of steps per episode
@@ -90,9 +92,21 @@ for ep in range(NUM_EPISODES): # Start out with fewer episodes
         # 5: repeat until convergence
         rew[iter_no][ep] = reward_n[0]
         # Check if optimal action has stayed constant for 25k repetitions
-        if iter_no > ITER_BREAK: # Calvano takes it up to a billion or until convergence! 
+        if iter_no > ITER_BREAK or agent1.length_opt_act > CONV: # Calvano takes it up to a billion or until 25k
+            if agent1.length_opt_act > CONV:
+                print("yay")
             break
 
 
 env.close()
+window = 50
+means = np.zeros(((ITER_BREAK/window).astype(int), NUM_EPISODES))
+start = 10
+stop = window
+for it in range((ITER_BREAK/window).astype(int)):
+    for ep in range(NUM_EPISODES):
+        start = start + it*window
+        stop = stop +  it*window
+        means[it][ep] = np.mean(rew[start:stop,ep])
 
+plt.plot(means)

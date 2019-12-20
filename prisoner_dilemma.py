@@ -54,6 +54,7 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
   metadata = {'render.modes': ['human']} #?
 
   def __init__(self):
+
       # self.nrow, self.ncol = nrow, ncol = desc.shape
       nrow = nA # Number of own possible actions, last state
       ncol = nA # Number of other's possible actions, last state
@@ -95,7 +96,7 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
                         action_n = np.array([action1, action2])
                         li = P[s][a]
                         newstate = to_s(action1, action2)
-                        done = False # TODO: test convergence?
+                        done = False # No need to update done at init – my stopping rule does not depend on state
                         reward_n = profit_n(action_n)
                         # Here, P[s][a] is not updated
                         li.append((1.0, newstate, reward_n, done)) # Why does it not need "P[s][a].append"?
