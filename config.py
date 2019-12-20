@@ -17,10 +17,10 @@ import numpy as np
 # =============================================================================
 GAMMA = 0.95 # discounting factor
 ALPHA = 0.1 # learning rate
-BETA = 4*10**(-5) # Parameter for epsilon greedy approach. Lower leads to more exploration
+BETA = 1*10**(-5) # Parameter for epsilon greedy approach. Lower leads to more exploration
 #NUM_EPISODES = 1000 # same as n.o. sessions in Calvano
 NUM_EPISODES = 10 # testing purposes
-ITER_BREAK = 10**6 # Calvano uses 10**9
+ITER_BREAK = 10**5 # Calvano uses 10**9
 CONV = 1000 # Calvano uses 25000
 K = 1 # Length of memory. I.e. remembering the last step
 M = 15 # n.o. actions.  Makes the discrete environment the prisoner dilemma (they mostly use 15)
@@ -35,7 +35,10 @@ MU = 1/2
 MIN_PRICE = 1.6
 MAX_PRICE = 1.74
 price_range = MAX_PRICE- MIN_PRICE
-ECON_PARAMS = np.array([C, A, A0, MU, MIN_PRICE, price_range])
+PROFIT_NASH = 0 # TODO: calculate these
+PROFIT_MONOPOLY = 1 # TODO: calculate these
+ECON_PARAMS = np.array([C, A, A0, MU, MIN_PRICE, price_range,
+                        PROFIT_NASH, PROFIT_MONOPOLY])
 
 AI = A
 AJ = A
@@ -51,7 +54,7 @@ def profit_n(action_n):
     a = np.array([AI, AJ])
     a_not = np.flip(a) # to obtain the other firm's a
       
-    p = (price_range * action_n/M) + MIN_PRICE # TODO: set up better. transforms action into price range
+    p = (price_range * action_n/M) + MIN_PRICE 
     p_not = np.flip(p) # to obtain the other firm's p
     num = np.exp((a - p)/MU)
     denom = np.exp((a - p)/(MU)) + np.exp((a_not - p_not)/(MU)) + np.exp(A0/MU)
@@ -59,3 +62,20 @@ def profit_n(action_n):
           
     profit = quantity_n * (p-C)
     return(profit)
+    
+def avg_profit_gain(avg_profit):
+    '''
+    avg_profit_gain() gives an index of collusion
+    INPUT
+    avg_profit......scalar. Mean profits before convergence
+    OUTPUT
+    apg.............normalised value of the scalar
+    '''
+    apg = (avg_profit - PROFIT_NASH) / (PROFIT_MONOPOLY - PROFIT_NASH)
+    return apg
+
+
+
+
+
+
