@@ -34,14 +34,7 @@ class Agent:
         self.best_action = 0
         self.length_opt_act = 0
         
-        # Initialize the Q-table.
-        for s in range(nS):
-            for a in range(nA):
-                action = a + np.zeros((nA))
-                action_other = np.arange(0.,nA) # Opponent randomizes uniformly
-                actions = np.vstack([action, action_other])
-                profit = profit_n(actions.transpose())
-                self.values[s, a] = (sum(profit[:,0])) / ((1-GAMMA) * nA)
+        self.initial_Q()
     
     def act(self, eps):
         if np.random.uniform() < eps: # eps goes from 0 to 1 over iterations
@@ -51,6 +44,12 @@ class Agent:
             action = self.env.action_space.sample()
         
         return action
+    
+    def reset(self):
+        self.best_action = 0
+        self.length_opt_act = 0
+        self.initial_Q()
+        return
     
     def max_value_action(self):
         # works a bit like argmax
@@ -76,6 +75,17 @@ class Agent:
         old_val = self.values[(s, a)]
         self.values[(s, a)] = old_val * (1-ALPHA) + new_val * ALPHA
         self.state = next_s
+
+
+    def initial_Q(self): # Initialize the Q-table.
+        for s in range(nS):
+            for a in range(nA):
+                action = a + np.zeros((nA))
+                action_other = np.arange(0.,nA) # Opponent randomizes uniformly
+                actions = np.vstack([action, action_other])
+                profit = profit_n(actions.transpose())
+                self.values[s, a] = (sum(profit[:,0])) / ((1-GAMMA) * nA)
+        return
 
     def play_episode(self, env):
         '''
