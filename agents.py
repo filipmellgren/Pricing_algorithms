@@ -66,6 +66,8 @@ class Agent:
     def time_same_best_action(self, action):
         if action == self.best_action:
             self.length_opt_act += 1
+        else:
+            self.length_opt_act = 0
         return
     
     def value_update(self, s, a, r, next_s):
