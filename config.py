@@ -18,12 +18,14 @@ import numpy as np
 GAMMA = 0.95 # discounting factor
 ALPHA = 0.1 # learning rate
 BETA = 4*10**(-5) # Parameter for epsilon greedy approach. Lower leads to more exploration
-NUM_EPISODES = 1000 # same as n.o. sessions in Calvano
+#NUM_EPISODES = 1000 # same as n.o. sessions in Calvano
+NUM_EPISODES = 10 # testing purposes
+ITER_BREAK = 10**5 # 10**6 takes 10:30 until  
 K = 1 # Length of memory. I.e. remembering the last step
 M = 15 # n.o. actions.  Makes the discrete environment the prisoner dilemma (they mostly use 15)
 nS = M**K
 
-PARAMS = np.array([GAMMA, ALPHA, BETA, NUM_EPISODES, K, M, nS])
+PARAMS = np.array([GAMMA, ALPHA, BETA, NUM_EPISODES, K, M, nS, ITER_BREAK])
 
 C = 1
 A = 2

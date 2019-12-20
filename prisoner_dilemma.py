@@ -24,10 +24,7 @@ MU = ECON_PARAMS[3]
 MIN_PRICE = ECON_PARAMS[4]
 PRICE_RANGE = ECON_PARAMS[5]
 
-
-
-nA = PARAMS[5] # Number of unique prices
-nA = nA.astype(int)
+nA = PARAMS[5].astype(int) # Number of unique prices
 
 class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
     # useful blog post:
@@ -58,8 +55,8 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
 
   def __init__(self):
       # self.nrow, self.ncol = nrow, ncol = desc.shape
-      nrow = nA
-      ncol = nA
+      nrow = nA # Number of own possible actions, last state
+      ncol = nA # Number of other's possible actions, last state
       nS = nrow * ncol
       isd = np.zeros(nS)
       P = {s : {a : [] for a in range(nA*nA)} for s in range(nS)} # Takes both actions into account
@@ -75,7 +72,7 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
           a = np.array([AI, AJ])
           a_not = np.flip(a) # to obtain the other firm's a
           
-          p = (PRICE_RANGE * action_n/nA) + MIN_PRICE # TODO: set up better. transforms action into price range
+          p = (PRICE_RANGE * action_n/nA) + MIN_PRICE
           
           p_not = np.flip(p) # to obtain the other firm's p
           num = np.exp((a - p)/MU)
@@ -86,6 +83,9 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
           return(profit)
           
           # Necessary to loop over everything in here?
+          # TODO: what does this even do?
+          # Update: P is indeed updated in the loop, albeit I do not see how
+          # But what is it used for?
       for row in range(nrow):
             for col in range(ncol):
                 s = to_s(row, col)
@@ -94,11 +94,12 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
                         a = to_s(action1, action2)
                         action_n = np.array([action1, action2])
                         li = P[s][a]
-                        newrow, newcol = action1, action2
-                        newstate = to_s(newrow, newcol)
-                        done = False # TODO: how to handle?
+                        newstate = to_s(action1, action2)
+                        done = False # TODO: test convergence?
                         reward_n = profit_n(action_n)
-                        li.append((1.0, newstate, reward_n, done)) # 1.0 is probability
+                        # Here, P[s][a] is not updated
+                        li.append((1.0, newstate, reward_n, done)) # Why does it not need "P[s][a].append"?
+                        # Here, P[s][a] is updated
       
       super(PrisonerDilemma, self).__init__(nS, nA, P, isd)
     
@@ -203,4 +204,12 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
 #           print(p)
 #       return
 # =============================================================================
+
+
+
+
+
+
+
+
 

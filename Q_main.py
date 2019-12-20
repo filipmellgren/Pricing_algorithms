@@ -35,9 +35,9 @@ from config import PARAMS
 GAMMA = PARAMS[0]
 ALPHA = PARAMS[1]
 BETA = PARAMS[2]
-NUM_EPISODES = PARAMS[3]
-NUM_EPISODES = NUM_EPISODES.astype(int) # so annoying this now has to be done
-nA = PARAMS[5]
+NUM_EPISODES = PARAMS[3].astype(int)
+nA = PARAMS[5].astype(int)
+ITER_BREAK = PARAMS[7].astype(int)
 # Objects
 agent1 = Agent()
 agent2 = Agent()
@@ -49,9 +49,8 @@ iter_no = 0
 ## TODOs ##
 # Replicate Calvano:
     # Update when to break an episode (define convergence)
-    # Initialize the Q table in a smarter way. P. 8 Calvano 
     # Add the average profit gain metric
-    # Scrutinize the loop in prisoner_dilemma
+    # Scrutinize the loop in prisoner_dilemma. Do I need P?
 
 # Continuous case
     # Make the observation space a box so that I can add on DL
@@ -64,10 +63,12 @@ iter_no = 0
 
 #### Q learning Algorithm
 # loop over training episodes p.105 Sutton
-rew = np.zeros((100002,NUM_EPISODES/50))
-for ep in range(NUM_EPISODES/50): # Start out with fewer episodes
+rew = np.zeros((ITER_BREAK+2,NUM_EPISODES+2))
+
+for ep in range(NUM_EPISODES): # Start out with fewer episodes
+    print(ep)
     # 1: initialise Qs
-    env.reset()
+    env.reset() # calls discrete.Discrete.reset() is this what I want?
     iter_no = 0
     s_next = 0
     while True: # number of steps per episode
@@ -89,13 +90,9 @@ for ep in range(NUM_EPISODES/50): # Start out with fewer episodes
         # 5: repeat until convergence
         rew[iter_no][ep] = reward_n[0]
         # Check if optimal action has stayed constant for 25k repetitions
-        if iter_no > 10**4: # Calvano takes it up to a billion or until convergence! 
+        if iter_no > ITER_BREAK: # Calvano takes it up to a billion or until convergence! 
             break
 
 
 env.close()
-
-
-x = np.array([[1, 2], [3, 4], [1,2]])
-profit_n(x)
 

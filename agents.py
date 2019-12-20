@@ -21,6 +21,8 @@ GAMMA = PARAMS[0]
 ALPHA = PARAMS[1]
 nA = PARAMS[5]
 nS = PARAMS[6]
+nA = nA.astype(int)
+nS = nS.astype(int)
 
 
 class Agent:
@@ -30,18 +32,17 @@ class Agent:
         self.state = self.env.reset()
         self.values = collections.defaultdict(float) # The Q-table?!
         
-        # Initialize the Q-table
+        # Initialize the Q-table.
         for s in range(nS):
             for a in range(nA):
                 action = a + np.zeros((nA))
-                action_other = np.arange(0.,nA)
+                action_other = np.arange(0.,nA) # Opponent randomizes uniformly
                 actions = np.vstack([action, action_other])
                 profit = profit_n(actions.transpose())
-                self.values = (sum(profit[:,0])) / ((1-GAMMA) * nA)
+                self.values[s, a] = (sum(profit[:,0])) / ((1-GAMMA) * nA)
     
     def act(self, eps):
-        # Make this depend on some epsilon greedy policy or Boltzman annealing
-        if np.random.uniform() > eps:
+        if np.random.uniform() < eps: # eps goes from 0 to 1 over iterations
             _, action = self.max_value_action()
         else:
             action = self.env.action_space.sample()
