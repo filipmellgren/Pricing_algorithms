@@ -73,7 +73,7 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
           a = np.array([AI, AJ])
           a_not = np.flip(a) # to obtain the other firm's a
           
-          p = (PRICE_RANGE * action_n/nA) + MIN_PRICE
+          p = (PRICE_RANGE * action_n/(nA-1)) + MIN_PRICE
           
           p_not = np.flip(p) # to obtain the other firm's p
           num = np.exp((a - p)/MU)
@@ -87,6 +87,7 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
           # TODO: what does this even do?
           # Update: P is indeed updated in the loop, albeit I do not see how
           # But what is it used for?
+          # Think: it gives the transitions for a given action in the step method
       for row in range(nrow):
             for col in range(ncol):
                 s = to_s(row, col)
@@ -107,7 +108,7 @@ class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
     # Markov game: 
     #https://stackoverflow.com/questions/44369938/openai-gym-environment-for-multi-agent-games
 
-
+# TODO: is this function even used?
   def interact(self, action_n):
       old_state_n = self.state_n
       new_state_n, reward_n, is_done, _ = self.step(action_n)

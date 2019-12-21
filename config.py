@@ -17,11 +17,17 @@ import numpy as np
 # =============================================================================
 GAMMA = 0.95 # discounting factor
 ALPHA = 0.1 # learning rate
-BETA = 1*10**(-5) # Parameter for epsilon greedy approach. Lower leads to more exploration
+BETA = 0.5*10**(-5) # Parameter for epsilon greedy approach. Lower leads to more exploration
 #NUM_EPISODES = 1000 # same as n.o. sessions in Calvano
-NUM_EPISODES = 10 # testing purposes
-ITER_BREAK = 10**5 # Calvano uses 10**9
-CONV = 1000 # Calvano uses 25000
+NUM_EPISODES = 5 # testing purposes
+ITER_BREAK = 2*10**6 # Calvano uses 10**9
+# Calvabo on number of iterations:
+# =============================================================================
+# But convergence requires a very large number
+# of periods, on the order of hundreds of thousands
+# =============================================================================
+
+CONV = 25000 # Calvano uses 25000
 K = 1 # Length of memory. I.e. remembering the last step
 M = 15 # n.o. actions.  Makes the discrete environment the prisoner dilemma (they mostly use 15)
 nS = M**K
@@ -32,11 +38,13 @@ C = 1
 A = 2
 A0 = 1
 MU = 1/2
+# TODO: derive these better:
 MIN_PRICE = 1.6
 MAX_PRICE = 1.74
 price_range = MAX_PRICE- MIN_PRICE
-PROFIT_NASH = 0 # TODO: calculate these
-PROFIT_MONOPOLY = 1 # TODO: calculate these
+# TODO: derive analytically and more generally
+PROFIT_NASH = 0.113203 
+PROFIT_MONOPOLY = 0.1157638
 ECON_PARAMS = np.array([C, A, A0, MU, MIN_PRICE, price_range,
                         PROFIT_NASH, PROFIT_MONOPOLY])
 
@@ -67,15 +75,9 @@ def avg_profit_gain(avg_profit):
     '''
     avg_profit_gain() gives an index of collusion
     INPUT
-    avg_profit......scalar. Mean profits before convergence
+    avg_profit......scalar. Mean profit over episodes.
     OUTPUT
     apg.............normalised value of the scalar
     '''
     apg = (avg_profit - PROFIT_NASH) / (PROFIT_MONOPOLY - PROFIT_NASH)
     return apg
-
-
-
-
-
-

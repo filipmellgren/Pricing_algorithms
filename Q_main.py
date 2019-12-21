@@ -28,6 +28,7 @@ import collections
 from tensorboardX import SummaryWriter
 from agents import Agent
 from prisoner_dilemma import PrisonerDilemma
+from config import avg_profit_gain
 # Parameters
 env = PrisonerDilemma()
 
@@ -49,64 +50,65 @@ iter_no = 0
 
 ## TODOs ##
 # Replicate Calvano:
-    # Update when to break an episode (define convergence)
-    # Add the average profit gain metric
-    # Scrutinize the loop in prisoner_dilemma. Do I need P?
+    # Add better values for price range and profits
+    # Figure out why I have different values
 
 # Continuous case
     # Make the observation space a box so that I can add on DL
    
 # Other
-    # Calvano et al introduces a bounded memeory of k steps which defines the state
-        # they use k = 1
     # Try new things: 
         # such as DQN, new demand function etc.
 
 #### Q learning Algorithm
 # loop over training episodes p.105 Sutton
-rew = np.zeros((ITER_BREAK+2,NUM_EPISODES+2))
+profits = np.zeros((ITER_BREAK+2,NUM_EPISODES+2))
 
 for ep in range(NUM_EPISODES): # Start out with fewer episodes
     print(ep)
     # 1: initialise Qs
     env.reset() # calls discrete.Discrete.reset() is this what I want?
-    # TODO: reset agent
+    agent1.reset()
+    agent2.reset()
     iter_no = 0
     s_next = 0
     while True: # number of steps per episode
         iter_no += 1
-        eps = 1 - np.exp(-BETA * (iter_no)) # Correct 
+        eps = 1 - np.exp(-BETA * (iter_no))
         # 2: agents choose actions simultanously. 
         action1 = agent1.act(eps)
         action2 = agent2.act(eps)
         action = action1*nA + action2 # converts two actions into an interpretable action
         # 3: outcomes are calculated
         s = s_next # remember old state
-        s_next, reward_n, done, prob = env.step(action)        
-        #s, a, r, s_next = env.interact(np.asarray([action1, action2]))
+        s_next, reward_n, done, prob = env.step(action)
         # 4: Bellman updates
         agent1.value_update(s, action1 ,reward_n[0],s_next)
         agent2.value_update(s, action2 ,reward_n[1],s_next)
-        #agent1.value_update(s[0].item(), a[0].item() ,r[0].item(), s_next[0].item())
-        #agent2.value_update(s[1].item(), a[1].item(), r[1].item(), s_next[1].item())
         # 5: repeat until convergence
-        rew[iter_no][ep] = reward_n[0]
+        # Store profit
+        profits[iter_no][ep] = reward_n[0]
         # Check if optimal action has stayed constant for 25k repetitions
-        if iter_no > ITER_BREAK or agent1.length_opt_act > CONV: # Calvano takes it up to a billion or until 25k
+        if iter_no > ITER_BREAK or agent1.length_opt_act > CONV:
             if agent1.length_opt_act > CONV:
                 print("yay")
+                print(iter_no)
             break
 
-
 env.close()
-window = 50
-means = np.zeros(((ITER_BREAK/window).astype(int), NUM_EPISODES))
-start = 10
-stop = window
-for it in range((ITER_BREAK/window).astype(int)):
-    for ep in range(NUM_EPISODES):
-        start = start + it*window
-        stop = stop +  it*window
-        means[it][ep] = np.mean(rew[start:stop,ep])
 
-plt.plot(means)
+# TODO: calculate mean profit gain over episodes
+import pandas as pd
+x = profits.mean(axis = 1)
+y = profits[1000:1900000]
+z = pd.DataFrame(y)
+z = z.iloc[:, [0,1,2, 3,4]] 
+w = np.mean(z, axis =1)
+w2 = w.rolling(1000, min_periods = 1).mean()
+z2 = z.rolling(1000).mean()
+z3 = avg_profit_gain(z2)
+w3 = avg_profit_gain(w2)
+plt.plot(w3)
+
+
+

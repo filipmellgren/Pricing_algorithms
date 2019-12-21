@@ -30,7 +30,7 @@ class Agent:
         #self.env = gym.make(ENV_NAME)
         self.env = env
         self.state = self.env.reset()
-        self.values = collections.defaultdict(float) # The Q-table?!
+        self.values = collections.defaultdict(float) # The Q-table?! #TODO: maybe not necessary given initial_Q()
         self.best_action = 0
         self.length_opt_act = 0
         
@@ -40,6 +40,7 @@ class Agent:
         if np.random.uniform() < eps: # eps goes from 0 to 1 over iterations
             _, action = self.max_value_action()
             self.time_same_best_action(action)
+            self.best_action = action
         else:
             action = self.env.action_space.sample()
         
@@ -49,6 +50,7 @@ class Agent:
         self.best_action = 0
         self.length_opt_act = 0
         self.initial_Q()
+        self.state = self.env.reset()
         return
     
     def max_value_action(self):
@@ -60,7 +62,6 @@ class Agent:
             if max_value is None or max_value < action_value:
                 max_value = action_value
                 best_action = action
-                self.best_action = action
         return max_value, best_action
     
     def time_same_best_action(self, action):
@@ -71,12 +72,12 @@ class Agent:
         return
     
     def value_update(self, s, a, r, next_s):
-        # Update states here?
+        self.state = next_s # Correct to update states here?
         best_v, _ = self.max_value_action()
         new_val = r + GAMMA * best_v
         old_val = self.values[(s, a)]
         self.values[(s, a)] = old_val * (1-ALPHA) + new_val * ALPHA
-        self.state = next_s
+        #self.state = next_s
 
 
     def initial_Q(self): # Initialize the Q-table.
@@ -85,7 +86,7 @@ class Agent:
                 action = a + np.zeros((nA))
                 action_other = np.arange(0.,nA) # Opponent randomizes uniformly
                 actions = np.vstack([action, action_other])
-                profit = profit_n(actions.transpose())
+                profit = profit_n(actions.transpose()) # TODO: check if transpose necessary
                 self.values[s, a] = (sum(profit[:,0])) / ((1-GAMMA) * nA)
         return
 
