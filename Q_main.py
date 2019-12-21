@@ -51,7 +51,9 @@ iter_no = 0
 ## TODOs ##
 # Replicate Calvano:
     # Add better values for price range and profits
-    # Figure out why I have different values
+    
+# Discrete case
+    # Add own specification
 
 # Continuous case
     # Make the observation space a box so that I can add on DL
