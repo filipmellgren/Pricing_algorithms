@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Dec 15 15:53:20 2019
+Created on Dec 22 2019
 
-@author: filip
+@author: Filip Mellgren
 
-# TODO: build on top of dicrete.Discrete
 """
 
 # Discrete case
@@ -26,7 +25,7 @@ PRICE_RANGE = ECON_PARAMS[5]
 
 nA = PARAMS[5].astype(int) # Number of unique prices
 
-class PrisonerDilemma(discrete.DiscreteEnv):  # maybe have to drop gym.Env
+class DiscrBertrand(discrete.DiscreteEnv):
     # useful blog post:
     # https://stackoverflow.com/questions/52727233/how-can-i-register-a-custom-environment-in-openais-gym
   """
