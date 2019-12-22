@@ -3,7 +3,7 @@
 """
 Created on Sun Dec 22 10:46:51 2019
 
-@author: filip
+@author: Filip Mellgren
 
 This is the main file for a multi agent reinforcement learning application
 where two agents compete in a discrete Bertrand environment, i.e. having price
@@ -12,7 +12,7 @@ profits K periods back. They are unable to see each others prices and profits.
 
 Question is, can they still learn how to cooperate?
 
-!git add "Q_main2.py"
+!git add "Q_main.py"
 !git add "agents.py"
 !git add "prisoner_dilemma.py"
 !git add "config.py"
@@ -20,8 +20,6 @@ Question is, can they still learn how to cooperate?
 !git push origin master
 
 !git pull
-
-
 
 
 """
