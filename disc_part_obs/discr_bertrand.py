@@ -102,5 +102,5 @@ class DiscrBertrand(discrete.DiscreteEnv):
                         li.append((1.0, newstate, reward_n, done)) # Why does it not need "P[s][a].append"?
                         # Here, P[s][a] is updated
       
-      super(PrisonerDilemma, self).__init__(nS, nA, P, isd)
+      super(DiscrBertrand, self).__init__(nS, nA, P, isd)
     
