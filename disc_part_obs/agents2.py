@@ -16,8 +16,8 @@ from tensorboardX import SummaryWriter
 from bertrand_nash import BertrandNash
 from discr_bertrand import DiscrBertrand
 #from __main__ import PARAMS
-from config import PARAMS
-from config import profit_n
+from config2 import PARAMS
+from config2 import profit_n
 
 env = DiscrBertrand()
 GAMMA = PARAMS[0]

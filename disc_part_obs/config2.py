@@ -37,8 +37,14 @@ price_range = MAX_PRICE- MIN_PRICE
 # TODO: derive analytically and more generally
 PROFIT_NASH = 0.113203 
 PROFIT_MONOPOLY = 0.1157638
+# TODO: the following is not true:
+MAX_REWARD = PROFIT_MONOPOLY
+MIN_REWARD = PROFIT_NASH
+NREWS = 15
+
 ECON_PARAMS = np.array([C, A, A0, MU, MIN_PRICE, price_range,
-                        PROFIT_NASH, PROFIT_MONOPOLY])
+                        PROFIT_NASH, PROFIT_MONOPOLY, MAX_REWARD, MIN_REWARD,
+                        NREWS])
 
 AI = A
 AJ = A
@@ -73,3 +79,14 @@ def avg_profit_gain(avg_profit):
     '''
     apg = (avg_profit - PROFIT_NASH) / (PROFIT_MONOPOLY - PROFIT_NASH)
     return apg
+
+def rew_to_int(reward):
+    rewrange = MAX_REWARD - MIN_REWARD
+    rewint = np.round(NREWS * (reward-MIN_REWARD)/rewrange).astype(int)
+    return(rewint)
+
+def to_s(act, reward): # TODO: hardcoded 15, 
+    '''
+
+    '''
+    return(act*NREWS + reward)

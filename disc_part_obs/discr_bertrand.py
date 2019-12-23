@@ -12,8 +12,8 @@ import gym
 from gym import spaces
 import numpy as np
 from gym.envs.toy_text import discrete
-from config import ECON_PARAMS
-from config import PARAMS
+from config2 import ECON_PARAMS
+from config2 import PARAMS
 
 C = ECON_PARAMS[0]
 AI = ECON_PARAMS[1]
@@ -22,6 +22,9 @@ A0 = ECON_PARAMS[2]
 MU = ECON_PARAMS[3]
 MIN_PRICE = ECON_PARAMS[4]
 PRICE_RANGE = ECON_PARAMS[5]
+MAX_REWARD = ECON_PARAMS[8]
+MIN_REWARD = ECON_PARAMS[9]
+NREWS = ECON_PARAMS[10].astype(int)
 
 nA = PARAMS[5].astype(int) # Number of unique prices
 
@@ -49,6 +52,7 @@ class DiscrBertrand(discrete.DiscreteEnv):
   
   """
   
+
   
   metadata = {'render.modes': ['human']} #?
 
@@ -56,19 +60,19 @@ class DiscrBertrand(discrete.DiscreteEnv):
 
       # self.nrow, self.ncol = nrow, ncol = desc.shape
       nrow = nA # Number of own possible actions, last state
-      ncol = nA # Number of other's possible actions, last state
-      nS = nrow * ncol
+      ncol = nA
+      nS = nrow * nA
       isd = np.zeros(nS)
       P = {s : {a : [] for a in range(nA*nA)} for s in range(nS)} # Takes both actions into account
       
       def to_s(row, col):
           '''
           enumerates row, col combo to a state. the row and col can be thought
-          of as actions in the last period in this application
+          of as action and profit in the last period in this application.
           '''
           return(row*ncol + col)
           
-      def profit_n(action_n):
+      def profit_n(action_n): # TODO: test import from config2
           a = np.array([AI, AJ])
           a_not = np.flip(a) # to obtain the other firm's a
           
@@ -81,12 +85,8 @@ class DiscrBertrand(discrete.DiscreteEnv):
           
           profit = quantity_n * (p-C)
           return(profit)
+
           
-          # Necessary to loop over everything in here?
-          # TODO: what does this even do?
-          # Update: P is indeed updated in the loop, albeit I do not see how
-          # But what is it used for?
-          # Think: it gives the transitions for a given action in the step method
       for row in range(nrow):
             for col in range(ncol):
                 s = to_s(row, col)
@@ -95,12 +95,11 @@ class DiscrBertrand(discrete.DiscreteEnv):
                         a = to_s(action1, action2)
                         action_n = np.array([action1, action2])
                         li = P[s][a]
-                        newstate = to_s(action1, action2)
-                        done = False # No need to update done at init – my stopping rule does not depend on state
                         reward_n = profit_n(action_n)
+                        newstate = to_s(action1, action2) # new env state is determined by what they did in the last period. TODO: is it even important whatexaclty it is?
+                        done = False # No need to update done at init – my stopping rule does not depend on state
                         # Here, P[s][a] is not updated
                         li.append((1.0, newstate, reward_n, done)) # Why does it not need "P[s][a].append"?
                         # Here, P[s][a] is updated
-      
       super(DiscrBertrand, self).__init__(nS, nA, P, isd)
     
