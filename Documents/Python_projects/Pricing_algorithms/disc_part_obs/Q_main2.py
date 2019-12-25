@@ -11,15 +11,15 @@ as their strategic variable. The agents are able to see their own prices and
 profits K periods back. They are unable to see each others prices and profits.
 
 Question is, can they still learn how to cooperate?
-
+1
 !git add "Q_main2.py"
 !git add "agents2.py"
 !git add "discr_bertrand.py"
 !git add "config2.py"
-!git commit -m "test"
+!git commit -m "test3"
 !git push origin master
 
-!git pull..
+!git pull
 
 From the correct directory in the terminal write:
     !tensorboard --logdir runs --host localhost
@@ -51,7 +51,6 @@ from discr_bertrand import DiscrBertrand
 from config2 import avg_profit_gain
 from config2 import rew_to_int
 from config2 import to_s
-from config2 import avg_profit_gain
 import time
 
 # Parameters
@@ -74,8 +73,6 @@ A0 = ECON_PARAMS[2]
 MU = ECON_PARAMS[3]
 MIN_PRICE = ECON_PARAMS[4]
 price_range = ECON_PARAMS[5]
-NASH_PROFIT = ECON_PARAMS[6][0]
-MONOPOLY_PROFIT = ECON_PARAMS[7]
 
 # Objects
 agent1 = Agent()
@@ -115,7 +112,6 @@ for ep in range(NUM_EPISODES):
         s_next1 = to_s(action1, reward1)
         s_next2 = to_s(action2, reward2)
         # 3.2 Add to writer (add both using add_embedding?)
-        apg = avg_profit_gain(reward1, NASH_PROFIT, MONOPOLY_PROFIT)
         writer.add_scalar(str(ep), reward1, iter_no)
         # 4: Bellman updates
         agent1.value_update(s, action1 ,reward_n[0],s_next1, ALPHA, GAMMA)
