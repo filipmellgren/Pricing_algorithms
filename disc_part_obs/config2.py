@@ -12,7 +12,7 @@ ALPHA = 0.1 # learning rate
 BETA = 0.5*10**(-5) # Parameter for epsilon greedy approach. Lower leads to more exploration
 #NUM_EPISODES = 1000 # same as n.o. sessions in Calvano
 NUM_EPISODES = 5 # testing purposes
-ITER_BREAK = 10**4 # Calvano uses 10**9
+ITER_BREAK = 10**5 # Calvano uses 10**9
 # Calvabo on number of iterations:
 # =============================================================================
 # But convergence requires a very large number
@@ -30,16 +30,16 @@ C = 1
 A = 2
 A0 = 1
 MU = 1/2
-# TODO: derive these better:
-MIN_PRICE = 1.6
-MAX_PRICE = 1.74
+# TODO: derive these 
+MIN_PRICE = 1.6136136136136137
+MAX_PRICE = 1.7371274174174174
 price_range = MAX_PRICE- MIN_PRICE
 # TODO: derive analytically and more generally
-PROFIT_NASH = 0.113203 
-PROFIT_MONOPOLY = 0.1157638
-# TODO: the following is not true:
-MAX_REWARD = PROFIT_MONOPOLY
-MIN_REWARD = PROFIT_NASH
+PROFIT_NASH = 0.1133853
+PROFIT_MONOPOLY = 0.1157638717582288
+# TODO: derive more carefully
+MAX_REWARD = 0.12593942529901705
+MIN_REWARD = -0.8668133321973348
 NREWS = 15
 
 ECON_PARAMS = np.array([C, A, A0, MU, MIN_PRICE, price_range,
@@ -49,7 +49,7 @@ ECON_PARAMS = np.array([C, A, A0, MU, MIN_PRICE, price_range,
 AI = A
 AJ = A
 
-def profit_n(action_n):
+def profit_n(action_n, c, ai, aj, a0, mu, price_range, min_price):
     '''
     profit_n gives profits in the market after taking prices as argument
     INPUT
@@ -57,16 +57,16 @@ def profit_n(action_n):
     OUTPUT
     profit.......profit, an np.array([]) containing profits
     '''
-    a = np.array([AI, AJ])
+    a = np.array([ai, aj])
     a_not = np.flip(a) # to obtain the other firm's a
       
-    p = (price_range * action_n/M) + MIN_PRICE 
+    p = (price_range * action_n/M) + min_price 
     p_not = np.flip(p) # to obtain the other firm's p
-    num = np.exp((a - p)/MU)
-    denom = np.exp((a - p)/(MU)) + np.exp((a_not - p_not)/(MU)) + np.exp(A0/MU)
+    num = np.exp((a - p)/mu)
+    denom = np.exp((a - p)/(mu)) + np.exp((a_not - p_not)/(mu)) + np.exp(a0/mu)
     quantity_n = num / denom
           
-    profit = quantity_n * (p-C)
+    profit = quantity_n * (p-c)
     return(profit)
     
 def avg_profit_gain(avg_profit):

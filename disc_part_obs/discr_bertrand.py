@@ -72,18 +72,18 @@ class DiscrBertrand(discrete.DiscreteEnv):
           '''
           return(row*ncol + col)
           
-      def profit_n(action_n): # TODO: test import from config2
-          a = np.array([AI, AJ])
+      def profit_n(action_n,c, ai, aj, a0, mu, price_range, min_price): # TODO: test import from config2
+          a = np.array([ai, aj])
           a_not = np.flip(a) # to obtain the other firm's a
           
-          p = (PRICE_RANGE * action_n/(nA-1)) + MIN_PRICE
+          p = (price_range * action_n/(nA-1)) + min_price
           
           p_not = np.flip(p) # to obtain the other firm's p
-          num = np.exp((a - p)/MU)
-          denom = np.exp((a - p)/(MU)) + np.exp((a_not - p_not)/(MU)) + np.exp(A0/MU)
+          num = np.exp((a - p)/mu)
+          denom = np.exp((a - p)/(mu)) + np.exp((a_not - p_not)/(mu)) + np.exp(a0/mu)
           quantity_n = num / denom
           
-          profit = quantity_n * (p-C)
+          profit = quantity_n * (p-c)
           return(profit)
 
           
@@ -95,7 +95,7 @@ class DiscrBertrand(discrete.DiscreteEnv):
                         a = to_s(action1, action2)
                         action_n = np.array([action1, action2])
                         li = P[s][a]
-                        reward_n = profit_n(action_n)
+                        reward_n = profit_n(action_n, C, AI, AJ, A0, MU, PRICE_RANGE, MIN_PRICE)
                         newstate = to_s(action1, action2) # new env state is determined by what they did in the last period. TODO: is it even important whatexaclty it is?
                         done = False # No need to update done at init – my stopping rule does not depend on state
                         # Here, P[s][a] is not updated
