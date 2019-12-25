@@ -16,7 +16,7 @@ Question is, can they still learn how to cooperate?
 !git add "agents2.py"
 !git add "discr_bertrand.py"
 !git add "config2.py"
-!git commit -m "commit"
+!git commit -m "resolved merge conflivt"
 !git push origin master
 
 !git pull..
@@ -51,6 +51,7 @@ from discr_bertrand import DiscrBertrand
 from config2 import avg_profit_gain
 from config2 import rew_to_int
 from config2 import to_s
+from config2 import avg_profit_gain
 import time
 
 # Parameters
@@ -112,7 +113,8 @@ for ep in range(NUM_EPISODES):
         s_next1 = to_s(action1, reward1)
         s_next2 = to_s(action2, reward2)
         # 3.2 Add to writer (add both using add_embedding?)
-        writer.add_scalar(str(ep), reward1, iter_no)
+        apg = avg_profit_gain(reward1)
+        writer.add_scalar(str(ep), apg, iter_no)
         # 4: Bellman updates
         agent1.value_update(s, action1 ,reward_n[0],s_next1, ALPHA, GAMMA)
         agent2.value_update(s, action2 ,reward_n[1],s_next2, ALPHA, GAMMA)
