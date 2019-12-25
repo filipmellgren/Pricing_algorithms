@@ -73,24 +73,25 @@ best_response = np.vstack((best_response, np.arange(nA))).transpose()
 Nash = best_response[:,0] == best_response[:,1]
 
 NASH_ACTION = np.argmax(Nash)
-NASH_PRICE = (price_range_tmp * NASH_ACTION/(nA-1)) + min_price_tmp
+NASH_PRICE = (price_range_tmp * NASH_ACTION/(nA-1)) + min_price_tmp # minus 1?
 NASH_PROFIT = profit_n(np.array((NASH_ACTION, NASH_ACTION)), nA, C, A, A, A0, MU, price_range_tmp, min_price_tmp)
 MIN_PROFIT = np.min(profits)
 MAX_PROFIT = np.max(profits)
 MAX_ACTION = np.argmax(best_response, axis = 0)[0] # highest action ever rational to take
 MAX_PRICE = (price_range_tmp * MAX_ACTION/(nA-1)) + min_price_tmp # Circular?
+MONOPOLY_ACTION = np.argmax(np.diag(profits))
+MONOPOLY_PRICE = (price_range_tmp * MONOPOLY_ACTION/(nA-1)) + min_price_tmp
 MONOPOLY_PROFIT = np.max(np.diag(profits)) # max profit w. constraint there's 1 price
-# MONOPOLY PRICE
+
 #PROFIT_NASH = 0.1133853
 #PROFIT_MONOPOLY = 0.1157638717582288
-
 MIN_PRICE = 0.9 * NASH_PRICE
-MAX_PRICE = 1.1 * PRICE_MONOPOLY
+MAX_PRICE = 1.1 * MONOPOLY_PRICE
 price_range = MAX_PRICE- MIN_PRICE
 NREWS = 15
 
 ECON_PARAMS = np.array([C, A, A0, MU, MIN_PRICE, price_range,
-                        PROFIT_NASH, MONOPOLY_PROFIT, MAX_PROFIT, MIN_PROFIT,
+                        NASH_PROFIT, MONOPOLY_PROFIT, MAX_PROFIT, MIN_PROFIT,
                         NREWS])
     
 def avg_profit_gain(avg_profit):
