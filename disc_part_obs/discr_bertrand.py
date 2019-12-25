@@ -14,6 +14,7 @@ import numpy as np
 from gym.envs.toy_text import discrete
 from config2 import ECON_PARAMS
 from config2 import PARAMS
+from config2 import profit_n
 
 C = ECON_PARAMS[0]
 AI = ECON_PARAMS[1]
@@ -29,77 +30,55 @@ NREWS = ECON_PARAMS[10].astype(int)
 nA = PARAMS[5].astype(int) # Number of unique prices
 
 class DiscrBertrand(discrete.DiscreteEnv):
+    metadata = {'render.modes': ['human']} #?
+    
     # useful blog post:
     # https://stackoverflow.com/questions/52727233/how-can-i-register-a-custom-environment-in-openais-gym
-  """
-  This environment represents a discrete world with two agents. The agents 
-  may set prices which generates profits depending on the joint behaviour.
-  
-  In principle, the environment is similar to FrozenLake with the difference 
-  that rows and columns (the state) are prices in the previous period.
-  
-  Inherits from discrete.Discrete which:
+    """
+    This environment represents a discrete world with two agents. The agents 
+    may set prices which generates profits depending on the joint behaviour.
       
+    In principle, the environment is similar to FrozenLake with the difference 
+    that rows and columns (the state) are prices in the previous period.
+      
+    Inherits from discrete.Discrete which:
+          
     Has the following members
     - nS: number of states
     - nA: number of actions
     - P: transitions (*)
     - isd: initial state distribution (**)
-    
     (*) dictionary dict of dicts of lists, where
-      P[s][a] == [(probability, nextstate, reward, done), ...]
+    P[s][a] == [(probability, nextstate, reward, done), ...]
     (**) list or array of length nS
-  
-  """
-  
+    """
+    def __init__(self):
+        # self.nrow, self.ncol = nrow, ncol = desc.shape
+        nrow = nA # Number of own possible actions, last state
+        ncol = nA
+        nS = nrow * nA
+        isd = np.zeros(nS)
+        P = {s : {a : [] for a in range(nA*nA)} for s in range(nS)} # Takes both actions into account
 
-  
-  metadata = {'render.modes': ['human']} #?
+        def to_s(row, col):
+            '''
+            enumerates row, col combo to a state. the row and col can be thought
+            of as action and profit in the last period in this application.
+            '''
+            return(row*ncol + col)
 
-  def __init__(self):
+        for s in range(nS): # TODO: Correct?
+            for action1 in range(nA): # TODO: can this be simplified?
+                for action2 in range(nA):
+                    a = to_s(action1, action2)
+                    action_n = np.array([action1, action2])
+                    li = P[s][a]
+                    reward_n = profit_n(action_n, nA, C, AI, AJ, A0, MU, PRICE_RANGE, MIN_PRICE)
+                    newstate = to_s(action1, action2) # new env state is determined by what they did in the last period. TODO: is it even important whatexaclty it is?
+                    done = False # No need to update done at init – my stopping rule does not depend on state
+                    # Here, P[s][a] is not updated
+                    li.append((1.0, newstate, reward_n, done)) # Why does it not need "P[s][a].append"?
+                    # Here, P[s][a] is updated
+        super(DiscrBertrand, self).__init__(nS, nA, P, isd)
 
-      # self.nrow, self.ncol = nrow, ncol = desc.shape
-      nrow = nA # Number of own possible actions, last state
-      ncol = nA
-      nS = nrow * nA
-      isd = np.zeros(nS)
-      P = {s : {a : [] for a in range(nA*nA)} for s in range(nS)} # Takes both actions into account
-      
-      def to_s(row, col):
-          '''
-          enumerates row, col combo to a state. the row and col can be thought
-          of as action and profit in the last period in this application.
-          '''
-          return(row*ncol + col)
-          
-      def profit_n(action_n,c, ai, aj, a0, mu, price_range, min_price): # TODO: test import from config2
-          a = np.array([ai, aj])
-          a_not = np.flip(a) # to obtain the other firm's a
-          
-          p = (price_range * action_n/(nA-1)) + min_price
-          
-          p_not = np.flip(p) # to obtain the other firm's p
-          num = np.exp((a - p)/mu)
-          denom = np.exp((a - p)/(mu)) + np.exp((a_not - p_not)/(mu)) + np.exp(a0/mu)
-          quantity_n = num / denom
-          
-          profit = quantity_n * (p-c)
-          return(profit)
 
-          
-      for row in range(nrow):
-            for col in range(ncol):
-                s = to_s(row, col)
-                for action1 in range(nA): 
-                    for action2 in range(nA):
-                        a = to_s(action1, action2)
-                        action_n = np.array([action1, action2])
-                        li = P[s][a]
-                        reward_n = profit_n(action_n, C, AI, AJ, A0, MU, PRICE_RANGE, MIN_PRICE)
-                        newstate = to_s(action1, action2) # new env state is determined by what they did in the last period. TODO: is it even important whatexaclty it is?
-                        done = False # No need to update done at init – my stopping rule does not depend on state
-                        # Here, P[s][a] is not updated
-                        li.append((1.0, newstate, reward_n, done)) # Why does it not need "P[s][a].append"?
-                        # Here, P[s][a] is updated
-      super(DiscrBertrand, self).__init__(nS, nA, P, isd)
-    
