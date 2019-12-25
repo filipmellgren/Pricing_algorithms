@@ -4,6 +4,26 @@
 Created on Sun Dec 22 10:55:38 2019
 
 @author: filip
+
+This file allows the user to first define hyperparameters related to the 
+dynamics of the Q-learning algorithm.
+
+It then takes a couple of parameters related to the economic environment such 
+as costs, differentiation, outside option, and substitutability. Using these,
+nash and monopoly prices and profits are calculated which in turn help 
+define the action space and observation space. 
+
+Additionally, some functions are defined that are used throughout the various 
+files.
+
+TODOs:
+     * derive environment boundaries analytically
+     * double check computation of the values
+     * consider using a larger number of actions to calculate prices and use 
+     this separately from the number of actions used for the action space.
+     This will increase the precision of the estimates of the Nash/Mon. prices.
+     * Pass variables as arguments instead of having them global.
+
 """
 import numpy as np
 
@@ -57,7 +77,7 @@ def profit_n(action_n, nA, c, ai, aj, a0, mu, price_range, min_price):
     profit = quantity_n * (p-c)
     return(profit)
 
-
+# Calculate Nash and monopoly profits using the following logic: 
 profits = np.zeros((nA, nA))
 
 for p1 in range(nA):
@@ -82,7 +102,6 @@ MAX_PRICE = (price_range_tmp * MAX_ACTION/(nA-1)) + min_price_tmp # Circular?
 MONOPOLY_ACTION = np.argmax(np.diag(profits))
 MONOPOLY_PRICE = (price_range_tmp * MONOPOLY_ACTION/(nA-1)) + min_price_tmp
 MONOPOLY_PROFIT = np.max(np.diag(profits)) # max profit w. constraint there's 1 price
-
 #PROFIT_NASH = 0.1133853
 #PROFIT_MONOPOLY = 0.1157638717582288
 MIN_PRICE = 0.9 * NASH_PRICE
